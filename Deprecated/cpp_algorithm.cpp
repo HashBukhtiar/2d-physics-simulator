@@ -1,7 +1,8 @@
-#include <stdio.h>
-#include <math.h>
+#include <iostream>
+#include <cmath>
+#include <chrono>
 
-typedef struct {
+struct Body {
     double x;
     double y;
     double mass;
@@ -9,15 +10,15 @@ typedef struct {
     double velocity_y;
     double acceleration_x;
     double acceleration_y;
-} Body;
+};
 
 double calculate_distance(double x1, double y1, double x2, double y2) {
     double dx = x2 - x1;
     double dy = y2 - y1;
-    return sqrt(dx * dx + dy * dy);
+    return std::sqrt(dx * dx + dy * dy);
 }
 
-void calculate_force(Body *obj, Body *other_objects, int num_objects, double *total_force_x, double *total_force_y) {
+void calculate_force(Body* obj, Body* other_objects, int num_objects, double* total_force_x, double* total_force_y) {
     double G = 6.67430e-11;  // gravitational constant
 
     for (int i = 0; i < num_objects; i++) {
@@ -34,7 +35,7 @@ void calculate_force(Body *obj, Body *other_objects, int num_objects, double *to
     }
 }
 
-void simulate_gravity(Body *objects, int num_objects) {
+void simulate_gravity(Body* objects, int num_objects) {
     double time_step = 0.01; // seconds per time step
     double simulation_time = 5; // seconds to simulate
 
@@ -43,8 +44,8 @@ void simulate_gravity(Body *objects, int num_objects) {
 
     for (int i = 0; i < num_objects; i++) {
         // Print the body's coordinates
-        printf("Time: %.3f seconds\n", 0.0);
-        printf("Body %d: (%.3f, %.3f)\n\n", i + 1, objects[i].x, objects[i].y);
+        std::cout << "Time: " << 0.0 << " seconds" << std::endl;
+        std::cout << "Body " << i + 1 << ": (" << objects[i].x << ", " << objects[i].y << ")" << std::endl << std::endl;
 
         // Store the initial coordinates
         obj_coords[i][0] = objects[i].x;
@@ -73,17 +74,20 @@ void simulate_gravity(Body *objects, int num_objects) {
 
             // Print the body's coordinates
             if (i == 0) {
-                printf("Time: %.3f seconds\n", timestep * time_step);
+                std::cout << "Time: " << timestep * time_step << " seconds" << std::endl;
             }
-            printf("Body %d: (%.3f, %.3f)\n", i + 1, objects[i].x, objects[i].y);
+            std::cout << "Body " << i + 1 << ": (" << objects[i].x << ", " << objects[i].y << ")" << std::endl;
             if (i == num_objects - 1) {
-                printf("\n");
+                std::cout << std::endl;
             }
         }
     }
 }
 
 int main() {
+    // Start the timer
+    auto start = std::chrono::high_resolution_clock::now();
+
     // Example with 3 objects
     Body obj1 = {0, -5, 1000, 3, 0, 0, 0};  // Body 1 with coordinates (0, -5), mass 1000, and initial velocity (3, 0)
     Body obj2 = {0, 0, 1e12, 0, 0, 0, 0};  // Body 2 with coordinates (0, 0), mass 1e12
@@ -93,6 +97,11 @@ int main() {
     int num_objects = sizeof(objects) / sizeof(objects[0]);
 
     simulate_gravity(objects, num_objects);
+
+    // End the timer and calculate the duration
+    auto end = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
+    std::cout << "Execution time: " << duration.count() << " microseconds" << std::endl;
 
     return 0;
 }
